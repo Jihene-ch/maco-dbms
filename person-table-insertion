@@ -1,0 +1,4 @@
+INSERT INTO Person VALUES (1000,1,"Benhmida","Sofia","sofia.benhmida@msb.tn","password1",1);
+INSERT INTO Person VALUES (1001,1,"Ben Yedder","Helmi","helmi.benyedder@msb.tn","password2",1);
+INSERT INTO Person VALUES (1002,1,"Ben Khlifa","karim", "karim.benkhlifa@medtech.tn","password3",1);
+INSERT INTO Person VALUES (1003,2,"Ben Hamed","Ahmed", "ahmed.benhamed@gmail.com","password3",1);
