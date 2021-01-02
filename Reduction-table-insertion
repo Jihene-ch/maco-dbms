@@ -1,0 +1,1 @@
+INSERT INTO `reduction` (`cID`, `reduction`, `reductionTypeID`) VALUES ('100', '50', '1'), ('101', '20', '2');
