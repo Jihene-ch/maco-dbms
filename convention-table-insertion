@@ -1,0 +1,2 @@
+INSERT INTO Convention VALUES (100,"Convention with teachers & california gym -50% yoga", 2021-01-12, 2021-03-15);
+INSERT INTO Convention VALUES (101,"Convention with students & eatme -20% sandwich",2021-04-12, 2021-06-14);
