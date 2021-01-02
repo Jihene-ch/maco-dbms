@@ -1,0 +1,86 @@
+CREATE TABLE PersonType (personTypeID int primary key, personType varchar(10));
+
+INSERT INTO PersonType VALUES (1, "SMUmember");
+INSERT INTO PersonType VALUES (2, "Manager");
+
+CREATE TABLE Person (
+  personID int, 
+  personTypeID int references PersonType(PersonTypeID), 
+  lastName varchar(255) NOT NULL, 
+  firstName varchar(255), 
+  email varchar(255), 
+  password varchar(255),
+  status bit,
+  PRIMARY KEY(personID), 
+  UNIQUE (personID,personTypeID));
+  
+CREATE TABLE smuType (smuTypeID int primary key, smuType varchar(10));
+
+INSERT INTO smuType VALUES (1, "Teacher");
+INSERT INTO smuType VALUES (2, "Student");
+  
+CREATE TABLE SMUmember( 
+  personID int primary key, 
+  personTypeID int not null default 1 check (personTypeID = 1), 
+  foreign key (personID, personTypeID) references Person(personID, personTypeID),
+  smuTypeID int REFERENCES smuType(smuTypeID),
+  UNIQUE (personID,smuTypeID)
+);
+
+CREATE TABLE Manager( 
+  personID int primary key, 
+  personTypeID int not null default 2 check (PersonTypeID = 2), 
+  foreign key (personID, personTypeID) references Person(personID, personTypeID)
+);
+
+CREATE TABLE Teacher( 
+  personID int primary key, 
+  smuTypeID int not null default 1 check (smuTypeID = 1), 
+  foreign key (personID, smuTypeID) references SMUmember(personID, smuTypeID)
+);
+
+CREATE TABLE Student( 
+  personID int primary key, 
+  smuTypeID int not null default 2 check (smuTypeID = 2), 
+  foreign key (personID, smuTypeID) references SMUmember(personID, smuTypeID)
+);
+
+CREATE TABLE Convention (cID int NOT NULL, description TEXT(500),startDate DATE,EndDate DATE, PRIMARY KEY(cID));
+
+CREATE TABLE ReductionType (reductionTypeID int primary key, reductionType varchar(10));
+    
+INSERT INTO reductionType VALUES (1, "teacherRedutcion");
+INSERT INTO reductionType VALUES (2, "studentReduction");
+
+
+CREATE TABLE Reduction(cID int NOT NULL,  reduction int, PRIMARY KEY(cID), foreign key(cID) REFERENCES Convention(cID),  reductionTypeID int REFERENCES reductionType(reductionTypeID),
+  UNIQUE (cID,reductionTypeID));
+
+CREATE TABLE TeacherReduction( 
+  cID int primary key, 
+  reductionTypeID int not null default 1 check (reductionTypeID = 1), 
+  foreign key (cID, reductionTypeID) references Reduction(cID, reductionTypeID)
+);
+
+CREATE TABLE studentReduction( 
+  cID int primary key, 
+  reductionTypeID int not null default 2 check (reductionTypeID = 2), 
+  foreign key (cID, reductionTypeID) references Reduction(cID, reductionTypeID)
+);
+
+
+CREATE TABLE teacherClaim( cId int, personID int, validated bit, foreign key (cID) references teacherReduction(cID), foreign key (personID) references teacher(personID));
+CREATE TABLE studentClaim( cId int, personID int, validated bit, foreign key (cID) references studentReduction(cID), foreign key (personID) references Student(personID));
+
+
+CREATE TABLE Partners(companyID int, name varchar(20), PRIMARY KEY(companyID));
+CREATE TABLE Category(categoryID int, name varchar(20), PRIMARY KEY(categoryID));
+
+CREATE TABLE WorksFor(PersonID int, companyid int, foreign key (personID) references Manager(personID), FOREIGN Key (companyid) references Partners (companyid));
+
+CREATE TABLE Rating(PersonID int, companyid int, foreign key (personID) references SMUmember(personID), FOREIGN Key (companyid) references Partners (companyid));
+
+CREATE TABLE RelatedTo(cID int, companyid int, foreign key (cID) references Convention(cID), FOREIGN Key (companyid) references Partners (companyid));
+
+CREATE TABLE has(CategoryID int, companyid int, foreign key (categoryID) references category(categoryID), FOREIGN Key (companyid) references Partners (companyid));
+
