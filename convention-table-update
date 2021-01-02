@@ -1,0 +1,3 @@
+
+UPDATE `convention` SET `startDate` = '2021-01-04', `EndDate` = '2021-03-16' WHERE `convention`.`cID` = 100;
+UPDATE `convention` SET `startDate` = '2021-03-03', `EndDate` = '2021-05-11' WHERE `convention`.`cID` = 101;
