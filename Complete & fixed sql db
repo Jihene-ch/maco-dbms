@@ -1,0 +1,141 @@
+CREATE TABLE PersonType (personTypeID int primary key, personType varchar(10));
+
+INSERT INTO PersonType VALUES (1, "SMUmember");
+INSERT INTO PersonType VALUES (2, "Manager");
+
+CREATE TABLE Person (
+  personID int, 
+  personTypeID int references PersonType(PersonTypeID), 
+  lastName varchar(255) NOT NULL, 
+  firstName varchar(255), 
+  email varchar(255), 
+  password varchar(255),
+  status bit,
+  PRIMARY KEY(personID), 
+  UNIQUE (personID,personTypeID));
+  
+  
+INSERT INTO Person VALUES (1000,1,"Benhmida","Sofia","sofia.benhmida@msb.tn","password1",1);
+INSERT INTO Person VALUES (1001,1,"Ben Yedder","Helmi","helmi.benyedder@msb.tn","password2",1);
+INSERT INTO Person VALUES (1002,1,"Ben Khlifa","karim", "karim.benkhlifa@medtech.tn","password3",1);
+INSERT INTO Person VALUES (1003,2,"Ben Hamed","Ahmed", "ahmed.benhamed@gmail.com","password3",1);
+  
+CREATE TABLE smuType (smuTypeID int primary key, smuType varchar(10));
+
+INSERT INTO smuType VALUES (1, "Teacher");
+INSERT INTO smuType VALUES (2, "Student");
+  
+CREATE TABLE SMUmember( 
+  personID int primary key, 
+  personTypeID int not null default 1 check (personTypeID = 1), 
+  foreign key (personID, personTypeID) references Person(personID, personTypeID),
+  smuTypeID int REFERENCES smuType(smuTypeID),
+  UNIQUE (personID,smuTypeID)
+);
+
+
+INSERT INTO SMUmember VALUES (1000,1,1);
+INSERT INTO SMUmember VALUES (1001,1,2);
+INSERT INTO SMUmember VALUES (1002,1,2);
+
+
+
+
+CREATE TABLE Manager( 
+  personID int primary key, 
+  personTypeID int not null default 2 check (PersonTypeID = 2), 
+  foreign key (personID, personTypeID) references Person(personID, personTypeID)
+);
+
+INSERT INTO Manager VALUES (1003,2);
+
+
+CREATE TABLE Teacher( 
+  personID int primary key, 
+  smuTypeID int not null default 1 check (smuTypeID = 1), 
+  foreign key (personID, smuTypeID) references SMUmember(personID, smuTypeID)
+);
+
+INSERT INTO Teacher VALUES (1000,1);
+
+
+CREATE TABLE Student( 
+  personID int primary key, 
+  smuTypeID int not null default 2 check (smuTypeID = 2), 
+  foreign key (personID, smuTypeID) references SMUmember(personID, smuTypeID)
+);
+
+INSERT INTO Student VALUES (1001,2);
+INSERT INTO Student VALUES (1002,2);
+
+CREATE TABLE Convention (cID int NOT NULL, description TEXT(500),startDate DATE,EndDate DATE, PRIMARY KEY(cID));
+
+INSERT INTO Convention VALUES (100,"Convention with teachers & california gym -50% yoga", 2021-01-12, 2021-03-15);
+INSERT INTO Convention VALUES (101,"Convention with students & eatme -20% sandwich",2021-04-12, 2021-06-14);
+
+UPDATE `convention` SET `startDate` = '2021-01-04', `EndDate` = '2021-03-16' WHERE `convention`.`cID` = 100;
+UPDATE `convention` SET `startDate` = '2021-03-03', `EndDate` = '2021-05-11' WHERE `convention`.`cID` = 101;
+
+
+CREATE TABLE ReductionType (reductionTypeID int primary key, reductionType varchar(10));
+    
+INSERT INTO reductionType VALUES (1, "teacherRedutcion");
+INSERT INTO reductionType VALUES (2, "studentReduction");
+
+
+CREATE TABLE Reduction(cID int NOT NULL,  reduction int, PRIMARY KEY(cID), foreign key(cID) REFERENCES Convention(cID),  reductionTypeID int REFERENCES reductionType(reductionTypeID),
+  UNIQUE (cID,reductionTypeID));
+
+INSERT INTO `reduction` (`cID`, `reduction`, `reductionTypeID`) VALUES ('100', '50', '1'), ('101', '20', '2');
+
+CREATE TABLE TeacherReduction( 
+  cID int primary key, 
+  reductionTypeID int not null default 1 check (reductionTypeID = 1), 
+  foreign key (cID, reductionTypeID) references Reduction(cID, reductionTypeID)
+);
+
+INSERT INTO `teacherreduction` (`cID`, `reductionTypeID`) VALUES ('100', '1');
+
+CREATE TABLE studentReduction( 
+  cID int primary key, 
+  reductionTypeID int not null default 2 check (reductionTypeID = 2), 
+  foreign key (cID, reductionTypeID) references Reduction(cID, reductionTypeID)
+);
+
+INSERT INTO `studentreduction` (`cID`, `reductionTypeID`) VALUES ('101', '2');
+
+CREATE TABLE teacherClaim( cId int, personID int, validated bit, foreign key (cID) references teacherReduction(cID), foreign key (personID) references teacher(personID));
+
+INSERT INTO `teacherclaim` (`cId`, `personID`, `validated`) VALUES ('100', '1000', b'0');
+
+CREATE TABLE studentClaim( cId int, personID int, validated bit, foreign key (cID) references studentReduction(cID), foreign key (personID) references Student(personID));
+
+INSERT INTO `studentclaim` (`cId`, `personID`, `validated`) VALUES ('101', '1001', b'0'), ('101', '1002', b'1');
+
+
+CREATE TABLE Partners(companyID int, name varchar(20), PRIMARY KEY(companyID));
+
+INSERT INTO `partners` (`companyID`, `name`) VALUES ('3001', 'calgym'), ('3002', 'eatme');
+
+
+CREATE TABLE Category(categoryID int, name varchar(20), PRIMARY KEY(categoryID));
+
+INSERT INTO `category` (`categoryID`, `name`) VALUES ('2001', 'sport'), ('2002', 'food');
+
+
+CREATE TABLE WorksFor(PersonID int, companyid int, foreign key (personID) references Manager(personID), FOREIGN Key (companyid) references Partners (companyid));
+
+INSERT INTO `worksfor` (`PersonID`, `companyid`) VALUES ('1003', '3001'), ('1003', '3002');
+
+CREATE TABLE Rating(PersonID int, companyid int, score int, foreign key (personID) references SMUmember(personID), FOREIGN Key (companyid) references Partners (companyid));
+
+INSERT INTO `rating` (`PersonID`, `companyid`, `score`) VALUES ('1000', '3001', '3'), ('1001', '3002', '2');
+
+CREATE TABLE RelatedTo(cID int, companyid int, foreign key (cID) references Convention(cID), FOREIGN Key (companyid) references Partners (companyid));
+
+INSERT INTO `relatedto` (`cID`, `companyid`) VALUES ('100', '3001'), ('101', '3002');
+
+CREATE TABLE has(CategoryID int, companyid int, foreign key (categoryID) references category(categoryID), FOREIGN Key (companyid) references Partners (companyid));
+
+INSERT INTO `has` (`CategoryID`, `companyid`) VALUES ('2001', '3001'), ('2002', '3002');
+
